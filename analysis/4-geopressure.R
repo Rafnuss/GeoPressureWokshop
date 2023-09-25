@@ -6,8 +6,8 @@
 library(GeoPressureR)
 
 # Define tag id that you want to compute
-list_id <- tail(names(yaml::yaml.load_file("config.yml", eval.expr = FALSE)), -1)
-# list_id <- c("18LX", "")
+list_id <- c("91D", "969", "1F3") # tail(names(yaml::yaml.load_file("config.yml", eval.expr = FALSE)), -1)
+# id = "1F3"
 
 for (id in list_id) {
 
@@ -22,7 +22,6 @@ for (id in list_id) {
     tag_set_map(
       extent = config::get("extent", id),
       scale = config::get("scale", id),
-      known = config::get("known", id),
       include_min_duration =  config::get("include_min_duration", id)
     )
 
@@ -35,18 +34,11 @@ for (id in list_id) {
     thr_mask = config::get("thr_mask", id)
   )
 
-  # If you have light data
-  # *Feel free to simply delete these lines*
-  if ("light" %in% names(tag)) {
-    tag <- twilight_create(tag) |>
-      twilight_label_read() |>
-      geolight_map()
-  }
-
   # Create the graph
   graph <- graph_create(tag,
                         thr_likelihood = config::get("thr_likelihood", id),
-                        thr_gs = config::get("thr_gs", id))
+                        thr_gs = config::get("thr_gs", id),
+                        workers = 2)
 
   # Define movement model
   if (config::get("movement_type", id) == "as") {
@@ -81,7 +73,7 @@ for (id in list_id) {
 
   # Computing the pressurepath on the most likely path is very useful for checkling labeling, and
   # estimating the altitude of your bird.
-  # pressurepath <- pressurepath_create(path_most_likely)
+  # pressurepath <- pressurepath_create(tag, path_most_likely)
 
   edge_simulation <- path2edge(path_simulation, graph)
   edge_most_likely <- path2edge(path_most_likely, graph)
@@ -95,7 +87,7 @@ for (id in list_id) {
     marginal,
     edge_simulation,
     edge_most_likely,
-    # pressurepath,
-    file = glue("./data/interim/{id}.RData")
+    pressurepath,
+    file = glue::glue("./data/interim/{id}.RData")
   )
 }

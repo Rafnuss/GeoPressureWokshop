@@ -23,8 +23,7 @@ library(job)
 ```
 
 ::: callout-tip
-*Delete this block when you have read!*
-## Set Copernicus credentials
+*Delete this block when you have read!* \## Set Copernicus credentials
 
 If you don't yet have one, create a Copernicus account at <https://cds.climate.copernicus.eu/user/15631/edit> and retrieve your API key and UID number
 
